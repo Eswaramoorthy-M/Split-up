@@ -9,7 +9,9 @@ import { listCategories, listMembers } from '@/services/groups'
 import type { Category, CycleInfo, Expense, GroupBalance, GroupMember } from '@/types'
 import { canManageExpense } from '@/lib/permissions'
 import { formatMoney, sumMoney } from '@/lib/money'
+import { exportExpensesExcel } from '@/lib/exportExpenses'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Spinner } from '@/components/ui/Spinner'
 import { Icon } from '@/components/ui/Icon'
@@ -46,6 +48,7 @@ export default function ManageExpenses() {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [editing, setEditing] = useState<Expense | null>(null)
   const [busyId, setBusyId] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
   const [message, setMessage] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
 
   // One-time setup: months, members and categories.
@@ -122,11 +125,40 @@ export default function ManageExpenses() {
     await load()
   }
 
+  // Admin-only: downloads EVERY expense (all months, ignoring the filters
+  // above) with who paid and each member's split, plus a member summary sheet.
+  const onExport = async () => {
+    if (!activeGroup || exporting) return
+    setExporting(true)
+    setMessage(null)
+    try {
+      await exportExpensesExcel(activeGroup)
+      setMessage({ kind: 'ok', text: 'Excel downloaded: all expenses with who paid and every member’s split.' })
+    } catch (err: any) {
+      setMessage({ kind: 'error', text: err.message ?? 'Export failed. Check your connection and try again.' })
+    } finally {
+      setExporting(false)
+    }
+  }
+
   return (
     <div>
       <div className="page-head">
         <h1 className="page-title">Manage expenses</h1>
-        <span className={clsx('role-badge', isAdmin && 'admin')}><Icon name={isAdmin ? 'settings' : 'user'} size={14} strokeWidth={2} />{isAdmin ? 'Admin' : 'Member'}</span>
+        <div className="row">
+          <span className={clsx('role-badge', isAdmin && 'admin')}><Icon name={isAdmin ? 'settings' : 'user'} size={14} strokeWidth={2} />{isAdmin ? 'Admin' : 'Member'}</span>
+          {isAdmin && (
+            <Button
+              variant="secondary"
+              className="btn-sm"
+              onClick={onExport}
+              disabled={exporting}
+              title="Download all expenses with who paid and each member's split as Excel"
+            >
+              <Icon name="download" size={16} />{exporting ? 'Exporting…' : 'Export Excel'}
+            </Button>
+          )}
+        </div>
       </div>
       <p className="page-sub">
         {isAdmin

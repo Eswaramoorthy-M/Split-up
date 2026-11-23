@@ -38,6 +38,7 @@ const PATHS: Record<string, ReactNode> = {
   banknote: <><rect x="2.5" y="6" width="19" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" /><path d="M6 12h.01M18 12h.01" /></>,
   refresh: <><path d="M19.5 10.5A7.5 7.5 0 0 0 6 6.8L3.5 9.2" /><path d="M3.5 4.5v4.7h4.7" /><path d="M4.5 13.5A7.5 7.5 0 0 0 18 17.2l2.5-2.4" /><path d="M20.5 19.5v-4.7h-4.7" /></>,
   inbox: <><path d="M3.5 13h5l1.5 2.5h4L15.5 13h5" /><path d="M6 5h12l2.5 8v5.5a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5V13z" /></>,
+  download: <><path d="M12 3.5v11M7.5 10.5 12 15l4.5-4.5" /><path d="M4.5 16.5v2.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-2.5" /></>,
   wallet: <><path d="M18.5 7.5V5.5A1.5 1.5 0 0 0 17 4H5.5a2 2 0 0 0 0 4H19a1.5 1.5 0 0 1 1.5 1.5V18a1.5 1.5 0 0 1-1.5 1.5H5.5a2 2 0 0 1-2-2V6" /><path d="M16.5 13.8h.01" /></>,
   alert: <><path d="M12 3.5 2.8 19.5h18.4z" /><path d="M12 10v4M12 17h.01" /></>,
   info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>

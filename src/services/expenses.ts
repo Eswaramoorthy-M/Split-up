@@ -165,6 +165,31 @@ export async function listExpensesForManage(groupId: string, cycleId?: string): 
   return (data ?? []) as unknown as Expense[]
 }
 
+/**
+ * Every expense in the group, oldest first, for the admin Excel export.
+ * Pages through the results because PostgREST caps a single request at 1000
+ * rows — a plain .limit(1000) would silently truncate busy groups.
+ */
+export async function listAllExpenses(groupId: string): Promise<Expense[]> {
+  const pageSize = 1000
+  const all: Expense[] = []
+  for (let page = 0; ; page++) {
+    const { data, error } = await supabase
+      .from('expenses')
+      .select(EXPENSE_SELECT)
+      .eq('group_id', groupId)
+      .eq('is_deleted', false)
+      .order('expense_date', { ascending: true })
+      .order('created_at', { ascending: true })
+      .range(page * pageSize, page * pageSize + pageSize - 1)
+    if (error) throw error
+    const rows = (data ?? []) as unknown as Expense[]
+    all.push(...rows)
+    if (rows.length < pageSize) break
+  }
+  return all
+}
+
 export async function listCycles(groupId: string) {
   const { data, error } = await supabase
     .from('monthly_cycles')
