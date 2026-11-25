@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Spinner } from '@/components/ui/Spinner'
 import { LogoMark } from '@/components/ui/Icon'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 // Opened from the link in the password-reset email. Supabase signs the person
 // in with a temporary recovery session so they can choose a new password.
@@ -34,6 +35,7 @@ export default function ResetPassword() {
   if (!session) {
     return (
       <div className="auth-page">
+        <div className="auth-theme"><ThemeToggle /></div>
         <div className="auth-box">
           <div className="auth-brand">
             <LogoMark size={34} />
@@ -51,6 +53,7 @@ export default function ResetPassword() {
 
   return (
     <div className="auth-page">
+      <div className="auth-theme"><ThemeToggle /></div>
       <div className="auth-box">
         <div className="auth-brand">
           <LogoMark size={34} />

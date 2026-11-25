@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Icon, LogoMark } from '@/components/ui/Icon'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 export default function Register() {
   const { signUp } = useAuth()
@@ -29,6 +30,7 @@ export default function Register() {
   if (done) {
     return (
       <div className="auth-page auth-done">
+        <div className="auth-theme"><ThemeToggle /></div>
         <div className="auth-card">
           <span className="done-icon" aria-hidden="true"><Icon name="message" size={26} /></span>
           <h1 className="page-title">Check your email</h1>
@@ -41,6 +43,7 @@ export default function Register() {
 
   return (
     <div className="auth-page">
+      <div className="auth-theme"><ThemeToggle /></div>
       <div className="auth-box">
         <div className="auth-brand">
           <LogoMark size={34} />

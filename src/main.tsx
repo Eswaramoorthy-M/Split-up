@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { AuthProvider } from './contexts/AuthContext'
 import { GroupProvider } from './contexts/GroupContext'
+import { ThemeProvider } from './contexts/ThemeContext'
 import { isSupabaseConfigured } from './lib/supabase'
 import { registerPwa } from './pwa'
 import { PwaPrompts } from './components/PwaPrompts'
@@ -22,14 +23,16 @@ if (!isSupabaseConfigured) {
 } else {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
-      <BrowserRouter>
-        <AuthProvider>
-          <GroupProvider>
-            <App />
-            <PwaPrompts />
-          </GroupProvider>
-        </AuthProvider>
-      </BrowserRouter>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <GroupProvider>
+              <App />
+              <PwaPrompts />
+            </GroupProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </React.StrictMode>
   )
 }

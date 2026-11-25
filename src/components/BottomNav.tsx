@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import clsx from 'clsx'
 import { Icon, LogoMark } from './ui/Icon'
+import { ThemeToggle } from './ui/ThemeToggle'
 
 const items = [
   { to: '/dashboard', label: 'Home', icon: 'home' },
@@ -27,6 +28,10 @@ export function BottomNav() {
           </li>
         ))}
       </ul>
+      <div className="nav-theme">
+        <span className="nav-theme-label">Theme</span>
+        <ThemeToggle />
+      </div>
     </nav>
   )
 }

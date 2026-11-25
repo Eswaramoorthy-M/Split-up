@@ -1,6 +1,7 @@
 import { forwardRef, ReactNode, useImperativeHandle, useLayoutEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { Icon, LogoMark } from '@/components/ui/Icon'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { AuthShowcase } from './AuthShowcase'
 
 const prefersReducedMotion = () =>
@@ -119,6 +120,7 @@ export const AuthLayout = forwardRef<AuthLayoutHandle, Props>(function AuthLayou
 
   return (
     <div className="login-page" ref={rootRef}>
+      <div className="auth-theme"><ThemeToggle /></div>
       <div className="login-shell">
         <AuthShowcase />
 

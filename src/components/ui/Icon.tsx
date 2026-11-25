@@ -41,7 +41,9 @@ const PATHS: Record<string, ReactNode> = {
   download: <><path d="M12 3.5v11M7.5 10.5 12 15l4.5-4.5" /><path d="M4.5 16.5v2.5a1.5 1.5 0 0 0 1.5 1.5h12a1.5 1.5 0 0 0 1.5-1.5v-2.5" /></>,
   wallet: <><path d="M18.5 7.5V5.5A1.5 1.5 0 0 0 17 4H5.5a2 2 0 0 0 0 4H19a1.5 1.5 0 0 1 1.5 1.5V18a1.5 1.5 0 0 1-1.5 1.5H5.5a2 2 0 0 1-2-2V6" /><path d="M16.5 13.8h.01" /></>,
   alert: <><path d="M12 3.5 2.8 19.5h18.4z" /><path d="M12 10v4M12 17h.01" /></>,
-  info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>
+  info: <><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></>,
+  sun: <><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" /></>,
+  moon: <path d="M20.4 14.3A8.6 8.6 0 0 1 9.7 3.6 8.6 8.6 0 1 0 20.4 14.3z" />
 }
 
 export type IconName = keyof typeof PATHS

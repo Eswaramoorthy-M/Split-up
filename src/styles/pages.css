@@ -263,7 +263,7 @@ button.pill-select { padding-right: 14px; background-image: none; }
 }
 
 .settled-note-flush { padding: 0; }
-.chart-box .recharts-pie-label-text, .chart-box .recharts-text { font-size: 12px; font-family: var(--font-body); }
+.chart-box .recharts-pie-label-text, .chart-box .recharts-text { font-size: 12px; font-family: var(--font-body); fill: var(--ink-500); }
 .report-month { max-width: 320px; }
 
 /* Member summary fits narrow phones without scrolling; long names wrap */

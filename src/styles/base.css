@@ -67,7 +67,62 @@
   --sidebar-w: 248px;
   --nav-h: 68px;
 
+  /* Theme surfaces */
+  --nav-bg: rgba(255, 255, 255, 0.88);
+  --overlay: rgba(22, 26, 46, 0.42);
+  --brand-contrast: #ffffff;
+
   color-scheme: light;
+}
+
+/* ===== Dark theme =====
+   Same ultramarine identity, re-tuned for a night surface: brighter brand
+   ink for legibility, deep navy paper, and money states that keep their
+   meaning without glowing. */
+[data-theme='dark'] {
+  --ink: #edf0fa;
+  --ink-700: #cfd4e8;
+  --ink-500: #9aa2bf;
+  --ink-300: #737b99;
+  --ink-200: #4a516f;
+  --paper: #0e1020;
+  --surface: #171a2c;
+  --surface-2: #1c2034;
+  --line: #272c43;
+  --line-strong: #353b58;
+
+  --brand: #8f80ff;
+  --brand-600: #7b6bf5;
+  --brand-700: #c9c2ff;
+  --brand-100: #38336f;
+  --brand-50: #242149;
+
+  --night: #14132e;
+  --night-2: #29246b;
+
+  --receive: #4fd1a5;
+  --receive-bg: #102a22;
+  --receive-line: #1f5543;
+  --owe: #ff9d8a;
+  --owe-bg: #2d1714;
+  --owe-line: #57312a;
+  --settled: #9aa2bf;
+  --settled-bg: #212639;
+  --warn: #f2c96f;
+  --warn-bg: #2c2413;
+  --warn-line: #4e401e;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45), 0 2px 10px -2px rgba(0, 0, 0, 0.5);
+  --shadow-hover: 0 2px 6px rgba(0, 0, 0, 0.45), 0 12px 28px -8px rgba(0, 0, 0, 0.62);
+  --shadow-pop: 0 28px 70px -14px rgba(0, 0, 0, 0.75), 0 6px 16px rgba(0, 0, 0, 0.45);
+  --ring: 0 0 0 4px rgba(143, 128, 255, 0.28);
+
+  --nav-bg: rgba(13, 15, 28, 0.86);
+  --overlay: rgba(3, 4, 10, 0.68);
+  --brand-contrast: #14122b;
+
+  color-scheme: dark;
 }
 
 /* ===== Reset ===== */
@@ -76,7 +131,7 @@
 *::after { box-sizing: border-box; }
 
 html, body, #root { height: 100%; }
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html { background: var(--paper); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 body,
 h1, h2, h3, p, ul, ol, figure, pre { margin: 0; }
