@@ -1,46 +1,58 @@
-import { useEffect, useMemo, useState } from 'react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from 'recharts'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import clsx from 'clsx'
 import { useGroup } from '@/contexts/GroupContext'
 import { useTheme } from '@/contexts/ThemeContext'
 import { listCycles } from '@/services/expenses'
 import { getCategoryBreakdown, CategoryTotal } from '@/services/reports'
 import { getGroupBalances, getSettlementSuggestions } from '@/services/balances'
-import { buildReportText, shareText, whatsappUrl } from '@/services/sharing'
+import { buildReportText, shareText } from '@/services/sharing'
 import type { CycleInfo, GroupBalance, SettlementSuggestion } from '@/types'
 import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { formatMoney, sumMoney } from '@/lib/money'
-import { Spinner } from '@/components/ui/Spinner'
 import { EmptyState } from '@/components/ui/EmptyState'
-import { CategoryTile, Icon } from '@/components/ui/Icon'
+import { Icon } from '@/components/ui/Icon'
+import { formatMoney, sumMoney } from '@/lib/money'
+import { gsap, ScrollTrigger, useGSAP } from '../animation'
+import { BarChartCard } from '../components/BarChartCard'
+import { DonutChartCard } from '../components/DonutChartCard'
+import { MonthPicker } from '../components/MonthPicker'
+import { PaymentBreakupCard } from '../components/PaymentBreakupCard'
+import { ReportSkeleton } from '../components/ReportSkeleton'
+import { ShareCard } from '../components/ShareCard'
+import {
+  DARK_CHART_COLORS, LIGHT_CHART_COLORS, percentOf, type CategoryView
+} from '../reportUtils'
 
-// Chart palette: brand ultramarine first, then distinct but harmonious hues.
-// Dark mode uses a lifted set so every slice stays legible on the night surface.
-const COLORS = ['#4A3AD0', '#0F8A5F', '#E0913A', '#C8462E', '#3A9BD9', '#9B5DE5', '#7A809B', '#B9AEF5']
-const DARK_COLORS = ['#8F80FF', '#3FC79A', '#F0B45E', '#F08A72', '#5FB6E8', '#B98CF0', '#9AA2BF', '#C9C2FF']
+/** One count-up tween with a proxy object; money stays formatted every frame. */
+function countTo(element: HTMLElement, duration: number) {
+  const target = Number(element.dataset.countValue ?? 0)
+  const currency = element.dataset.countCurrency ?? 'INR'
+  const proxy = { value: 0 }
+  element.textContent = formatMoney(0, currency)
+  return gsap.to(proxy, {
+    value: target,
+    duration,
+    ease: 'power2.out',
+    snap: { value: 0.01 },
+    onUpdate: () => { element.textContent = formatMoney(proxy.value, currency) },
+    onComplete: () => { element.textContent = formatMoney(target, currency) }
+  })
+}
+
+function settleCounts(root: HTMLElement) {
+  root.querySelectorAll<HTMLElement>('[data-count-value]').forEach(element => {
+    element.textContent = formatMoney(
+      Number(element.dataset.countValue ?? 0),
+      element.dataset.countCurrency ?? 'INR'
+    )
+  })
+}
 
 export default function MonthlyReport() {
   const { activeGroup } = useGroup()
   const { theme } = useTheme()
   const isDark = theme === 'dark'
-  const chartColors = isDark ? DARK_COLORS : COLORS
-  const axisTick = { fontSize: 12, fill: isDark ? '#9AA2BF' : '#5C6280' }
-  const tooltipStyle = {
-    contentStyle: {
-      borderRadius: 12,
-      border: `1px solid ${isDark ? '#353B58' : '#E5E7EF'}`,
-      background: isDark ? '#1C2034' : '#FFFFFF',
-      boxShadow: isDark
-        ? '0 12px 28px -8px rgba(0,0,0,0.62)'
-        : '0 10px 24px -8px rgba(22,26,46,0.18)',
-      fontSize: 13,
-      padding: '8px 12px'
-    },
-    labelStyle: { color: isDark ? '#EDF0FA' : '#161A2E', fontWeight: 600, marginBottom: 2 },
-    itemStyle: { color: isDark ? '#CFD4E8' : '#33384F' },
-    cursor: { fill: isDark ? 'rgba(143,128,255,0.10)' : 'rgba(74, 58, 208, 0.06)' }
-  }
+  const chartColors = isDark ? DARK_CHART_COLORS : LIGHT_CHART_COLORS
+
   const [cycles, setCycles] = useState<CycleInfo[]>([])
   const [selected, setSelected] = useState('')
   const [categories, setCategories] = useState<CategoryTotal[]>([])
@@ -49,7 +61,10 @@ export default function MonthlyReport() {
   const [loadingCycles, setLoadingCycles] = useState(true)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(null)
+
   const currency = activeGroup?.currency ?? 'INR'
+  const rootRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!activeGroup) return
@@ -86,139 +101,223 @@ export default function MonthlyReport() {
     [activeGroup, month, currency, categories, balances, suggestions]
   )
 
+  const categoryViews = useMemo<CategoryView[]>(
+    () => categories.map((category, index) => ({
+      ...category,
+      percent: percentOf(category.total, total),
+      color: chartColors[index % chartColors.length]
+    })),
+    [categories, total, chartColors]
+  )
+
+  const { contextSafe } = useGSAP(() => {
+    const root = rootRef.current
+    if (!root) return
+
+    const mm = gsap.matchMedia()
+    mm.add({
+      motion: '(prefers-reduced-motion: no-preference)',
+      hover: '(hover: hover) and (min-width: 1024px)'
+    }, context => {
+      const { motion, hover } = context.conditions ?? {}
+      const content = contentRef.current
+      const title = root.querySelector<HTMLElement>('[data-report-title]')
+      const monthPicker = root.querySelector<HTMLElement>('[data-report-month]')
+      const hero = root.querySelector<HTMLElement>('[data-hero]')
+      const glows = gsap.utils.toArray<HTMLElement>('.hero-glow', root)
+      const cards = gsap.utils.toArray<HTMLElement>('[data-animate]', root)
+      const bodyCards = cards.filter(card => card !== hero)
+      const paymentRows = gsap.utils.toArray<HTMLElement>('[data-report-row="payment"]', root)
+      const revealTargets = [...cards, title, monthPicker].filter(Boolean) as HTMLElement[]
+
+      if (!motion) {
+        if (content) gsap.set(content, { clearProps: 'all' })
+        if (revealTargets.length) gsap.set(revealTargets, { clearProps: 'all' })
+        settleCounts(root)
+        return
+      }
+
+      if (content) gsap.set(content, { opacity: 1, y: 0 })
+      if (title) gsap.set(title, { opacity: 0, y: -14 })
+      if (monthPicker) gsap.set(monthPicker, { opacity: 0, scale: 0.94 })
+      if (hero) gsap.set(hero, { opacity: 0, scale: 0.96 })
+      if (bodyCards.length) gsap.set(bodyCards, { opacity: 0, y: 24 })
+
+      const heroCount = hero?.querySelector<HTMLElement>('[data-count-value]')
+      if (heroCount) countTo(heroCount, 0.9)
+
+      const intro = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      if (title) intro.to(title, { opacity: 1, y: 0, duration: 0.5 })
+      if (monthPicker) intro.to(monthPicker, { opacity: 1, scale: 1, duration: 0.42 }, '-=0.32')
+      if (hero) intro.to(hero, { opacity: 1, scale: 1, duration: 0.6 }, '-=0.16')
+      if (bodyCards.length) intro.to(bodyCards, { opacity: 1, y: 0, duration: 0.55, stagger: 0.08 }, '-=0.34')
+
+      glows.forEach((glow, index) => {
+        gsap.to(glow, {
+          x: index === 0 ? 26 : -20,
+          y: index === 0 ? -14 : 18,
+          scale: 1.12,
+          duration: 6 + index * 1.5,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut'
+        })
+      })
+
+      const fabIcon = document.querySelector<SVGElement>('.fab .icon')
+      if (fabIcon) {
+        gsap.to(fabIcon, {
+          scale: 1.1,
+          rotation: 4,
+          duration: 1.8,
+          repeat: -1,
+          yoyo: true,
+          ease: 'sine.inOut',
+          transformOrigin: 'center center'
+        })
+      }
+
+      paymentRows.forEach(row => {
+        const counter = row.querySelector<HTMLElement>('[data-count-value]')
+        const rowTimeline = gsap.timeline({
+          scrollTrigger: { trigger: row, start: 'top 85%', once: true }
+        })
+        rowTimeline.fromTo(row, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45 })
+        if (counter) rowTimeline.add(countTo(counter, 0.65), 0)
+      })
+
+      const settleTotal = root.querySelector<HTMLElement>('[data-settle-total] [data-count-value]')
+      const settleTarget = root.querySelector('[data-settle-total]')
+      if (settleTotal && settleTarget) {
+        gsap.timeline({ scrollTrigger: { trigger: settleTarget, start: 'top 88%', once: true } })
+          .add(countTo(settleTotal, 0.75))
+      }
+
+      if (!hover) return
+
+      const cleanupHover: Array<() => void> = []
+      bodyCards.forEach(card => {
+        const enter = () => gsap.to(card, { y: -4, scale: 1.004, duration: 0.25, ease: 'power2.out' })
+        const leave = () => gsap.to(card, { y: 0, scale: 1, duration: 0.3, ease: 'power2.out' })
+        card.addEventListener('mouseenter', enter)
+        card.addEventListener('mouseleave', leave)
+        cleanupHover.push(() => {
+          card.removeEventListener('mouseenter', enter)
+          card.removeEventListener('mouseleave', leave)
+        })
+      })
+      return () => cleanupHover.forEach(remove => remove())
+    })
+
+    ScrollTrigger.refresh()
+  }, {
+    scope: rootRef,
+    dependencies: [selected, loading, categories, balances, suggestions, month?.label, isDark],
+    revertOnUpdate: true
+  })
+
+  const changeMonth = contextSafe((value: string) => {
+    if (value === selected) return
+    const content = contentRef.current
+    gsap.killTweensOf(content)
+    if (!content || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setSelected(value)
+      return
+    }
+    gsap.to(content, {
+      opacity: 0,
+      y: -8,
+      duration: 0.2,
+      ease: 'power2.in',
+      onComplete: () => setSelected(value)
+    })
+  })
+
   const onShare = async () => {
     const result = await shareText(reportText, `${month?.label ?? ''} expense report`)
     if (result === 'copied') setMessage({ ok: true, text: 'Report copied. Paste it into WhatsApp.' })
+    return result
   }
 
-  if (loadingCycles) return <div className="center-spinner"><Spinner /></div>
+  if (loadingCycles) {
+    return <div className="report-page" ref={rootRef}><ReportSkeleton /></div>
+  }
+
   if (cycles.length === 0) {
-    return <EmptyState title="No reports yet" body="Reports appear once your group has some expenses." />
+    return (
+      <div className="report-page" ref={rootRef}>
+        <EmptyState title="No reports yet" body="Reports appear once your group has some expenses." />
+      </div>
+    )
   }
 
   return (
-    <div>
-      <div className="page-head">
-        <h1 className="page-title">Monthly report</h1>
-      </div>
-
-      <select className="select mt-md report-month" aria-label="Select month" value={selected} onChange={e => setSelected(e.target.value)}>
-        {cycles.map(c => <option key={c.id} value={c.id}>{c.label}{c.status === 'closed' ? ' (closed)' : ''}</option>)}
-      </select>
+    <div className="report-page" ref={rootRef}>
+      <header className="report-header">
+        <div className="report-header-inner">
+          <div className="report-heading">
+            <p className="report-eyebrow">Insights</p>
+            <h1 className="report-title" data-report-title>Monthly report</h1>
+          </div>
+          <MonthPicker cycles={cycles} value={selected} onChange={changeMonth} />
+        </div>
+      </header>
 
       {message && (
-        <p className={clsx('banner mt-sm', message.ok ? 'banner-ok' : 'banner-error')} role={message.ok ? 'status' : 'alert'}>{message.text}</p>
+        <p className={clsx('banner mt-sm', message.ok ? 'banner-ok' : 'banner-error')} role={message.ok ? 'status' : 'alert'}>
+          {message.text}
+        </p>
       )}
 
       {loading ? (
-        <div className="center-spinner"><Spinner /></div>
+        <ReportSkeleton />
       ) : (
-        <>
-          <Card className="hero-card mt-md">
-            <p className="card-label">Total expenses</p>
-            <p className="big-number">{formatMoney(total, currency)}</p>
-          </Card>
-
-
-          <h2 className="section-title">Category-wise breakdown</h2>
-          <Card>
-            {categories.length === 0 ? (
-              <p className="muted text-sm">No expenses in this month.</p>
-            ) : (
-              <div className="stack-xs">
-                {categories.map(c => (
-                  <div key={c.category} className="category-line"><span className="cat-name"><CategoryTile icon={c.icon} size="sm" />{c.category}</span><span className="tabular fw-semibold">{formatMoney(c.total, currency)}</span></div>
-                ))}
-                <div className="category-line category-total"><span>Total expenses</span><span className="tabular">{formatMoney(total, currency)}</span></div>
+        <div className="report-layout" ref={contentRef}>
+          <Card className="report-card report-hero" data-animate data-hero>
+            <span className="hero-glow hero-glow-a" aria-hidden="true" />
+            <span className="hero-glow hero-glow-b" aria-hidden="true" />
+            <div className="hero-content">
+              <div className="hero-topline">
+                <span className="hero-label">Total expenses</span>
+                <span className="hero-chip">
+                  <Icon name="chart" size={14} />
+                  {month?.label ?? 'This month'}{month?.status === 'closed' ? ' · Closed' : ''}
+                </span>
               </div>
-            )}
-          </Card>
-
-          <h2 className="section-title">Payment breakup</h2>
-          <Card>
-            {suggestions.length === 0 ? (
-              <p className="settled-note settled-note-flush"><Icon name="checkCircle" size={20} />Everyone is settled up.</p>
-            ) : (
-              <div className="stack-xs">
-                {suggestions.map(s => (
-                  <div key={`${s.from_user}-${s.to_user}`} className="category-line">
-                    <span><strong>{s.from_name}</strong> to pay <strong>{s.to_name}</strong></span>
-                    <span className="tabular fw-medium text-owe">{formatMoney(s.amount, currency)}</span>
-                  </div>
-                ))}
-                <div className="category-line category-total"><span>Total to settle</span><span className="tabular">{formatMoney(toSettle, currency)}</span></div>
-              </div>
-            )}
-          </Card>
-
-          <h2 className="section-title">Member summary</h2>
-          <Card>
-            <div className="table-scroll"><div className="report-table">
-              <div className="report-row report-head">
-                <span>Member</span><span>Paid</span><span>Share</span><span>Balance</span>
-              </div>
-              {balances.map(b => (
-                <div key={b.user_id} className="report-row">
-                  <span>{b.name}</span>
-                  <span>{formatMoney(b.total_paid, currency)}</span>
-                  <span>{formatMoney(b.total_share, currency)}</span>
-                  <span className={`fw-semibold ${b.net_balance >= 0 ? 'text-receive' : 'text-owe'}`}>{formatMoney(b.net_balance, currency)}</span>
-                </div>
-              ))}
-            </div></div>
-          </Card>
-
-          <h2 className="section-title">Share this report</h2>
-          <Card>
-            <p className="muted text-sm">Category totals, member summary and who pays whom, ready for WhatsApp.</p>
-            <pre className="report-preview" aria-label="Report preview">{reportText}</pre>
-            <div className="action-row mt-md">
-              <a className="btn btn-primary" href={whatsappUrl(reportText)} target="_blank" rel="noopener noreferrer"><Icon name="message" size={18} />Share on WhatsApp</a>
-              <Button variant="secondary" onClick={onShare}><Icon name="copy" size={18} />Share / copy</Button>
+              <p className="hero-amount count-value" data-count-value={total} data-count-currency={currency}>
+                {formatMoney(total, currency)}
+              </p>
+              <p className="hero-meta">
+                Across <strong>{categories.length}</strong> {categories.length === 1 ? 'category' : 'categories'}
+                <span aria-hidden="true"> · </span>{activeGroup?.group_name ?? 'Your group'}
+              </p>
             </div>
           </Card>
 
-          <div className="report-grid">
-          <div>
-          <h2 className="section-title">Expenses by member</h2>
-          <Card>
-            <div className="chart-box">
-              <ResponsiveContainer>
-                <BarChart data={balances.map(b => ({ name: b.name.split(' ')[0], paid: b.total_paid }))} margin={{ top: 8, right: 4, left: -8, bottom: 0 }}>
-                  <CartesianGrid vertical={false} stroke={isDark ? '#272C43' : '#EEF0F5'} />
-                  <XAxis dataKey="name" tick={axisTick} axisLine={false} tickLine={false} />
-                  <YAxis tick={axisTick} axisLine={false} tickLine={false} width={56} />
-                  <Tooltip formatter={(v: number) => formatMoney(v, currency)} {...tooltipStyle} />
-                  <Bar dataKey="paid" fill={isDark ? '#8F80FF' : '#4A3AD0'} radius={[8, 8, 0, 0]} maxBarSize={44} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </Card>
-          </div>
+          <DonutChartCard
+            categories={categoryViews}
+            total={total}
+            currency={currency}
+            isDark={isDark}
+            monthLabel={month?.label ?? ''}
+          />
 
-          {categories.length > 0 && (
-            <div>
-              <h2 className="section-title">Expenses by category</h2>
-              <Card>
-                <div className="chart-box tall">
-                  <ResponsiveContainer>
-                    <PieChart>
-                      <Pie
-                        data={categories} dataKey="total" nameKey="category"
-                        innerRadius={52} outerRadius={88} paddingAngle={2} cornerRadius={6} stroke={isDark ? '#171A2C' : '#fff'} strokeWidth={2}
-                        label={(d: any) => d.category} labelLine={false}
-                      >
-                        {categories.map((_, i) => <Cell key={i} fill={chartColors[i % chartColors.length]} />)}
-                      </Pie>
-                      <Tooltip formatter={(v: number) => formatMoney(v, currency)} {...tooltipStyle} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </Card>
-            </div>
-          )}
-          </div>
-        </>
+          <PaymentBreakupCard
+            suggestions={suggestions}
+            total={toSettle}
+            currency={currency}
+            isDark={isDark}
+          />
+
+          <BarChartCard
+            balances={balances}
+            currency={currency}
+            isDark={isDark}
+            monthLabel={month?.label ?? ''}
+          />
+
+          <ShareCard reportText={reportText} monthLabel={month?.label ?? 'this month'} onShare={onShare} />
+        </div>
       )}
     </div>
   )

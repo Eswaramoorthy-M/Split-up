@@ -38,6 +38,9 @@ const UpiTransactions = lazy(() => import('@/features/settlements/pages/UpiTrans
 // Monthly Report pulls in recharts, the single heaviest dependency, so it
 // gets its own chunk that only loads when the person opens Reports.
 const MonthlyReport = lazy(() => import('@/features/reports/pages/MonthlyReport'))
+const MusicApp = lazy(() => import('@/features/music/MusicApp'))
+// TEMP preview route — remove before final.
+const ReportPreview = lazy(() => import('@/features/reports/pages/ReportPreview'))
 const ManageExpenses = lazy(() => import('@/features/manage/pages/ManageExpenses'))
 const Notifications = lazy(() => import('@/features/notifications/pages/Notifications'))
 const Profile = lazy(() => import('@/features/profile/pages/Profile'))
@@ -60,6 +63,13 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
       </Route>
       <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* TEMP preview route — remove before final. */}
+      <Route element={<AppLayout />}>
+        <Route path="/preview-reports" element={<ReportPreview />} />
+      </Route>
+
+      <Route path="/music" element={<MusicApp />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/groups" element={<GroupSelect />} />

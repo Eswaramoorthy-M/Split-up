@@ -8,6 +8,7 @@ const PATHS: Record<string, ReactNode> = {
   receipt: <><path d="M5.5 3.5h13v17l-2.6-1.6-2.2 1.6-1.7-1.6-1.7 1.6-2.2-1.6-2.6 1.6z" /><path d="M9 8.5h6M9 12h6M9 15.5h3.5" /></>,
   exchange: <><path d="M4 8h15.5l-4-4" /><path d="M20 16H4.5l4 4" /></>,
   chart: <><path d="M3.5 20.5h17" /><rect x="5" y="11" width="3.2" height="6.5" rx="1" /><rect x="10.4" y="5" width="3.2" height="12.5" rx="1" /><rect x="15.8" y="13.5" width="3.2" height="4" rx="1" /></>,
+  calendar: <><rect x="4" y="5.5" width="16" height="15" rx="2.5" /><path d="M8 3.5v4M16 3.5v4M4 10h16" /></>,
   grid: <><rect x="4" y="4" width="6.5" height="6.5" rx="1.6" /><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6" /><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6" /><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6" /></>,
   plus: <path d="M12 5v14M5 12h14" />,
   x: <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" />,
