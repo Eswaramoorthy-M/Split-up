@@ -563,6 +563,91 @@
 .report-settled strong { display: block; font-size: 14px; }
 .report-settled p { margin-top: 2px; font-size: 12.5px; opacity: 0.82; }
 
+/* ---------- Mobile payment rows ---------- */
+@media (max-width: 639px) {
+  .report-page {
+    max-width: 100%;
+    padding-bottom: calc(168px + env(safe-area-inset-bottom, 0px));
+    overflow-x: hidden;
+  }
+  .report-layout,
+  .report-layout > * { max-width: 100%; }
+
+  .report-card-head { flex-wrap: wrap; gap: 8px 10px; }
+  .report-card-head > div { flex: 1 1 140px; min-width: 0; }
+  .report-card-count { max-width: 100%; white-space: normal; }
+
+  .payment-list { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .payment-list > * { min-width: 0; }
+  .payment-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    min-width: 0;
+    min-height: 0;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface-2);
+  }
+  .payment-people {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+  .payment-person {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+  }
+  .payment-row .avatar { width: 32px; height: 32px; font-size: 11.5px; }
+  .payment-name {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+    font-size: 13px;
+  }
+  .payment-arrow {
+    width: 22px;
+    height: 22px;
+    margin-left: 12px;
+    transform: rotate(90deg);
+  }
+  .payment-amount {
+    justify-self: start;
+    max-width: 100%;
+    padding: 7px 11px;
+    border: 1px solid var(--owe-line);
+    border-radius: 999px;
+    background: var(--owe-bg);
+    font-size: 14px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .payment-amount::before {
+    content: 'pays ';
+    font-weight: 600;
+    opacity: 0.82;
+  }
+  .payment-footer {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 14px;
+    font-size: 15px;
+  }
+  .payment-footer .count-value { font-size: 16px; }
+  .report-settled { min-height: 56px; }
+}
+
 /* ---------- Share card ---------- */
 .share-badge {
   display: inline-flex;

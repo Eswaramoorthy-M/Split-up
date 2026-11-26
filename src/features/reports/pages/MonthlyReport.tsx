@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Icon } from '@/components/ui/Icon'
 import { formatMoney, sumMoney } from '@/lib/money'
+import { guardReveal } from '@/lib/motionFallback'
 import { gsap, ScrollTrigger, useGSAP } from '../animation'
 import { BarChartCard } from '../components/BarChartCard'
 import { DonutChartCard } from '../components/DonutChartCard'
@@ -215,6 +216,26 @@ export default function MonthlyReport() {
     dependencies: [selected, loading, categories, balances, suggestions, month?.label, isDark],
     revertOnUpdate: true
   })
+
+  // Keep the report visible if the intro or month-change tween never gets its
+  // first frame on a cold PWA launch.
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+    const revealTargets = () => [
+      contentRef.current,
+      root.querySelector<HTMLElement>('[data-report-title]'),
+      root.querySelector<HTMLElement>('[data-report-month]'),
+      ...gsap.utils.toArray<HTMLElement>('[data-animate]', root)
+    ].filter(Boolean) as HTMLElement[]
+
+    return guardReveal(revealTargets, () => {
+      const targets = revealTargets()
+      gsap.killTweensOf(targets)
+      gsap.set(targets, { opacity: 1, x: 0, y: 0, scale: 1 })
+      settleCounts(root)
+    }, 3000)
+  }, [selected, loading, month?.label])
 
   const changeMonth = contextSafe((value: string) => {
     if (value === selected) return

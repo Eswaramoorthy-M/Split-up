@@ -1,0 +1,579 @@
+/* =====================================================================
+   Dashboard — fintech-grade home surface
+   Every colour comes from base/theme tokens. Motion lives in
+   src/features/dashboard/animation.ts and is scoped to this page.
+   ===================================================================== */
+
+.dashboard-page {
+  /* Keep the last row and the CTA clear of the bottom nav, the floating +,
+     and the phone's home indicator. */
+  padding-bottom: calc(var(--nav-h) + 64px + env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+/* ---------- Header ---------- */
+.dash-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.dash-header-copy { min-width: 0; }
+.dash-greeting {
+  color: var(--ink-500);
+  font-size: 13px;
+  font-weight: 600;
+}
+.dash-title { font-size: clamp(24px, 6vw, 30px); font-weight: 700; }
+.dash-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dash-group-pill,
+.dash-switch-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.dash-group-pill {
+  max-width: min(52vw, 190px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink-700);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-xs);
+}
+.dash-switch-chip {
+  color: var(--brand-contrast);
+  background: linear-gradient(135deg, var(--brand), var(--brand-600));
+  box-shadow: var(--shadow-xs);
+}
+
+/* ---------- Hero ----------
+   The hero is a dark statement surface in both themes. Every colour inside
+   it is fixed on .hero-card--dark so theme tokens (light surfaces, dark ink)
+   can never leak in and wash out the text. */
+.hero-card--dark {
+  --hero-text: #ffffff;
+  --hero-muted: rgba(255, 255, 255, 0.72);
+  --hero-tile-bg: rgba(255, 255, 255, 0.10);
+  --hero-tile-border: rgba(255, 255, 255, 0.14);
+  --hero-chip-bg: rgba(255, 255, 255, 0.16);
+  --hero-chip-ink: #ffffff;
+  --hero-chip-owe-bg: rgba(255, 154, 138, 0.18);
+  --hero-chip-owe-ink: #ffb3a1;
+  --hero-chip-receive-bg: rgba(110, 231, 168, 0.18);
+  --hero-chip-receive-ink: #6ee7a8;
+  --hero-badge-bg: rgba(255, 255, 255, 0.16);
+  --hero-divider: rgba(255, 255, 255, 0.18);
+  --hero-track: rgba(255, 255, 255, 0.2);
+  --hero-progress: #6ee7a8;
+  --hero-pending: #ff9a8a;
+  --hero-settled: #6ee7a8;
+}
+.dash-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl);
+  color: var(--hero-text);
+  background: linear-gradient(145deg, #26246a, #1b1a3d);
+  box-shadow: var(--shadow-hover);
+}
+
+.dash-hero-mesh {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.dash-glow {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  opacity: 0.32;
+  will-change: transform;
+}
+.dash-glow--a {
+  top: -110px;
+  left: -70px;
+  background: radial-gradient(circle, #7c6cff, transparent 68%);
+}
+.dash-glow--b {
+  right: -100px;
+  bottom: -120px;
+  background: radial-gradient(circle, #26246a, transparent 68%);
+}
+.dash-glow--c {
+  top: 28%;
+  right: 18%;
+  width: 130px;
+  height: 130px;
+  background: radial-gradient(circle, #3b2db3, transparent 70%);
+  opacity: 0.2;
+}
+
+.dash-hero-inner {
+  position: relative;
+  z-index: 1;
+  padding: 22px 18px 18px;
+}
+.dash-hero-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+.dash-hero-summary { flex: 1; min-width: 0; }
+.dash-hero-label-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.dash-hero-label {
+  margin: 0;
+  color: var(--hero-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+.dash-month-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid var(--hero-tile-border);
+  background: var(--hero-badge-bg);
+  color: var(--hero-text);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.dash-hero-amount {
+  margin-top: 8px;
+  color: var(--hero-text);
+  font-family: var(--font-display);
+  font-size: clamp(32px, 9vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.dash-progress {
+  position: relative;
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+}
+.dash-progress svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.dash-progress circle {
+  fill: none;
+  stroke-width: 7;
+}
+.dash-progress-track {
+  stroke: var(--hero-track);
+}
+.dash-progress-value {
+  stroke: var(--hero-progress);
+  stroke-linecap: round;
+}
+.dash-progress-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--hero-text);
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--hero-divider);
+}
+.dash-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--hero-tile-border);
+  background: var(--hero-tile-bg);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.dash-stat-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  color: var(--hero-chip-ink);
+  background: var(--hero-chip-bg);
+}
+.dash-stat--owe .dash-stat-icon { color: var(--hero-chip-owe-ink); background: var(--hero-chip-owe-bg); }
+.dash-stat--receive .dash-stat-icon { color: var(--hero-chip-receive-ink); background: var(--hero-chip-receive-bg); }
+.dash-stat-copy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--hero-muted);
+  font-size: 12px;
+}
+.dash-stat-copy strong {
+  color: var(--hero-text);
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dash-stat--owe .dash-stat-copy strong { color: var(--hero-pending); }
+.dash-stat--receive .dash-stat-copy strong { color: var(--hero-settled); }
+
+/* ---------- Your balance ---------- */
+.dash-balance-card {
+  margin-top: 16px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  color: var(--ink);
+  background: var(--settled-bg);
+  border-color: var(--line);
+}
+.dash-balance-card.receive {
+  color: var(--receive);
+  background: var(--receive-bg);
+  border-color: var(--receive-line);
+}
+.dash-balance-card.owe {
+  color: var(--owe);
+  background: var(--owe-bg);
+  border-color: var(--owe-line);
+}
+/* Light-mode state inks are tuned locally for AA on the tinted cards;
+   dark mode keeps its existing token values. */
+.dash-balance-card.receive { --balance-ink: #0c7753; --balance-muted-opacity: 1; }
+.dash-balance-card.owe { --balance-ink: #b93c25; --balance-muted-opacity: 1; }
+[data-theme='dark'] .dash-balance-card.receive { --balance-ink: var(--receive); --balance-muted-opacity: 0.85; }
+[data-theme='dark'] .dash-balance-card.owe { --balance-ink: var(--owe); --balance-muted-opacity: 0.85; }
+.dash-balance-card.settled {
+  color: var(--ink-700);
+  background: var(--settled-bg);
+  border-color: var(--line);
+}
+.dash-balance-head { display: flex; align-items: center; gap: 12px; }
+.dash-balance-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  color: inherit;
+  background: var(--surface);
+}
+.dash-balance-label,
+.dash-balance-caption { margin: 0; opacity: 0.85; }
+.dash-balance-label { font-size: 13px; font-weight: 700; }
+.dash-balance-caption { margin-top: 2px; font-size: 12.5px; }
+.dash-balance-card.receive .dash-balance-label,
+.dash-balance-card.receive .dash-balance-caption,
+.dash-balance-card.owe .dash-balance-label,
+.dash-balance-card.owe .dash-balance-caption {
+  color: var(--balance-ink);
+  opacity: var(--balance-muted-opacity);
+}
+.dash-balance-amount {
+  margin: 12px 0 16px;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 8vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+.dash-balance-card.receive .dash-balance-amount,
+.dash-balance-card.owe .dash-balance-amount { color: var(--balance-ink); }
+.dash-compare { display: flex; flex-direction: column; gap: 7px; }
+.dash-compare-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: var(--ink-500);
+  font-size: 12.5px;
+}
+.dash-compare-row strong { color: var(--ink); }
+.dash-compare-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line);
+}
+/* Neutral translucent tracks stay visible on the tinted card without
+   introducing another theme token into the comparison bars. */
+.dash-balance-card.owe .dash-compare-track { background: rgba(22, 26, 46, 0.38); }
+[data-theme='dark'] .dash-balance-card.owe .dash-compare-track { background: rgba(255, 255, 255, 0.35); }
+.dash-compare-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  will-change: transform;
+}
+.dash-compare-fill--muted { opacity: 0.45; }
+/* Paid and your share must read as two different measures, not one hue
+   at two opacities. */
+.dash-balance-card.owe .dash-compare-fill { background: var(--brand); }
+.dash-balance-card.owe .dash-compare-fill--muted { background: var(--ink-700); opacity: 1; }
+
+/* ---------- Who owes what ---------- */
+.dash-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0 12px;
+}
+.dash-section-head .section-title { margin: 0; }
+.dash-section-sub { margin-top: 3px; color: var(--ink-500); font-size: 12.5px; }
+.dash-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  color: var(--brand-contrast);
+  background: linear-gradient(135deg, var(--brand), var(--brand-600));
+  box-shadow: var(--shadow-hover);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.dash-list-card { padding: 6px 14px; border-radius: var(--radius-lg); }
+.dash-rows { display: flex; flex-direction: column; }
+.dash-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 0;
+}
+.dash-row + .dash-row { border-top: 1px solid var(--line); }
+.dashboard-page .dash-avatar {
+  --dash-avatar-ink: var(--brand-contrast);
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  color: var(--dash-avatar-ink);
+  background: linear-gradient(135deg, var(--brand), var(--night-2));
+  box-shadow: none;
+  font-size: 14px;
+}
+[data-theme='dark'] .dashboard-page .dash-avatar { --dash-avatar-ink: var(--ink); }
+.dashboard-page .dash-avatar--receive {
+  background: linear-gradient(135deg, var(--receive), var(--brand));
+}
+.dashboard-page .dash-avatar--owe {
+  background: linear-gradient(135deg, var(--owe), var(--brand-600));
+}
+.dash-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.dash-row-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+}
+.dash-row-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--line);
+}
+.dash-row-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  will-change: transform;
+}
+.dash-row-fill--receive { background: var(--receive); }
+.dash-row-fill--owe { background: var(--owe); }
+.dashboard-page .dash-amount-pill {
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  font-size: 12.5px;
+}
+
+.dash-settled {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 6px;
+}
+.dash-settled-icon { width: 56px; height: 56px; flex: 0 0 auto; }
+.dash-settled-circle {
+  fill: var(--receive-bg);
+  stroke: var(--receive-line);
+  stroke-width: 2;
+}
+.dash-settled-check {
+  fill: none;
+  stroke: var(--receive);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.dash-settled strong { display: block; font-size: 14.5px; }
+.dash-settled span {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-500);
+  font-size: 12.5px;
+}
+
+/* ---------- Skeleton ---------- */
+.dashboard-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.dash-skeleton-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.dash-skeleton-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 8px;
+}
+.dash-skeleton-line,
+.dash-skeleton-chip,
+.dash-skeleton-tile,
+.dash-skeleton-avatar,
+.dash-skeleton-pill {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.dash-skeleton-line i,
+.dash-skeleton-chip i,
+.dash-skeleton-tile i,
+.dash-skeleton-avatar i,
+.dash-skeleton-pill i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--surface-2), var(--brand-50), var(--surface-2));
+}
+.dash-skeleton-line { height: 12px; border-radius: 999px; }
+.dash-skeleton-line--sm { width: 40%; }
+.dash-skeleton-line--md { width: 65%; }
+.dash-skeleton-line--lg { width: 85%; height: 24px; }
+.dash-skeleton-line--amount { width: 70%; height: 40px; margin-top: 12px; }
+.dash-skeleton-chip { width: 84px; height: 44px; border-radius: 999px; }
+.dash-skeleton-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+.dash-skeleton-hero.hero-card--dark {
+  border-color: transparent;
+  background: linear-gradient(145deg, #26246a, #1b1a3d);
+}
+.dash-skeleton-hero .dash-skeleton-line,
+.dash-skeleton-hero .dash-skeleton-tile,
+.dash-skeleton-hero .dash-skeleton-chip {
+  border-color: var(--hero-tile-border);
+  background: var(--hero-tile-bg);
+}
+.dash-skeleton-hero .dash-skeleton-line i,
+.dash-skeleton-hero .dash-skeleton-tile i,
+.dash-skeleton-hero .dash-skeleton-chip i {
+  background: linear-gradient(90deg, var(--hero-tile-bg), var(--hero-badge-bg), var(--hero-tile-bg));
+}
+.dash-skeleton-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 20px;
+}
+.dash-skeleton-tile { height: 56px; border-radius: var(--radius); }
+.dash-skeleton-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+.dash-skeleton-row + .dash-skeleton-row { border-top: 1px solid var(--line); }
+.dash-skeleton-avatar { width: 36px; height: 36px; border-radius: 12px; flex: 0 0 auto; }
+.dash-skeleton-pill { width: 90px; height: 26px; margin-left: auto; border-radius: 999px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 599px) {
+  /* Give the CTA its own full-width row above the list so the floating +
+     button cannot sit on top of it. */
+  .dash-section-head { align-items: stretch; }
+  .dash-cta { justify-content: center; width: 100%; }
+}
+
+@media (min-width: 600px) {
+  .dash-hero-inner { padding: 26px 24px 22px; }
+  .dash-stats,
+  .dash-skeleton-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dash-cta { min-height: 48px; }
+}
+
+@media (max-width: 390px) {
+  .dash-group-pill { max-width: 132px; font-size: 12px; }
+  .dash-progress { width: 76px; height: 76px; }
+  .dash-progress-label { font-size: 14px; }
+  .dash-stat { gap: 8px; padding: 9px; }
+  .dash-stat-icon { width: 30px; height: 30px; }
+  .dash-amount-pill { max-width: 50%; }
+}

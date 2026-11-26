@@ -62,6 +62,14 @@ a.btn { text-decoration: none; }
 .input-code { text-align: center; letter-spacing: 0.24em; font-family: var(--font-display); font-size: 20px; font-weight: 600; text-transform: uppercase; }
 .input-code::placeholder { letter-spacing: 0.24em; color: var(--ink-200); }
 
+/* Optional leading icon, used by the redesigned Profile fields */
+.input-wrap-with-icon .input { padding-left: 44px; }
+.input-start-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ink-300); pointer-events: none; z-index: 1;
+}
+
 /* Password field: eye toggle inside the input */
 .input-wrap { position: relative; }
 .input-wrap .input { display: block; }
@@ -219,6 +227,15 @@ input[type='date'].input { min-width: 0; }
 .split-input:focus { outline: none; border-color: var(--brand); box-shadow: var(--ring); background: var(--surface); }
 .split-input.wide { width: 108px; }
 .split-unit { color: var(--ink-500); font-size: 14px; }
+/* Structural helpers stay invisible on desktop; the phone layout turns them
+   into the compact card without changing the existing desktop composition. */
+.split-identity,
+.split-input-wrap { display: contents; }
+.split-secondary,
+.split-adornment,
+.split-summary-title,
+.split-hint,
+.split-quick-actions { display: none; }
 .split-status {
   display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; margin-top: 4px;
   padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600;

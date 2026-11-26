@@ -8,6 +8,7 @@ import { ThemeProvider } from './contexts/ThemeContext'
 import { isSupabaseConfigured } from './lib/supabase'
 import { registerPwa } from './pwa'
 import { PwaPrompts } from './components/PwaPrompts'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import './index.css'
 
 registerPwa()
@@ -23,16 +24,18 @@ if (!isSupabaseConfigured) {
 } else {
   ReactDOM.createRoot(root).render(
     <React.StrictMode>
-      <ThemeProvider>
-        <BrowserRouter>
-          <AuthProvider>
-            <GroupProvider>
-              <App />
-              <PwaPrompts />
-            </GroupProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </ThemeProvider>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <BrowserRouter>
+            <AuthProvider>
+              <GroupProvider>
+                <App />
+                <PwaPrompts />
+              </GroupProvider>
+            </AuthProvider>
+          </BrowserRouter>
+        </ThemeProvider>
+      </ErrorBoundary>
     </React.StrictMode>
   )
 }

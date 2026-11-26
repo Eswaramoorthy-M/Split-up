@@ -39,6 +39,8 @@ export function PaymentBreakupCard({ suggestions, total, currency, isDark }: Pro
               key={`${suggestion.from_user}-${suggestion.to_user}`}
               className="payment-row"
               data-report-row="payment"
+              role="group"
+              aria-label={`${suggestion.from_name} pays ${suggestion.to_name} ${formatMoney(suggestion.amount, currency)}`}
             >
               <div className="payment-people">
                 <span className="payment-person">

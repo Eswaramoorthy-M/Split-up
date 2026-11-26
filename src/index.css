@@ -5,4 +5,7 @@
 @import './styles/pages.css';
 @import './styles/reports.css';
 @import './styles/music.css';
+@import './styles/profile.css';
+@import './styles/dashboard.css';
+@import './styles/expenses.css';
 @import './styles/theme.css';

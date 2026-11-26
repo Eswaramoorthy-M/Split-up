@@ -24,13 +24,14 @@ export default function Login() {
     if (error) {
       setError(error)
       layoutRef.current?.shake()
+      layoutRef.current?.mobileError()
     } else {
-      navigate('/dashboard')
+      layoutRef.current?.mobileSuccess(() => navigate('/dashboard'))
     }
   }
 
   return (
-    <AuthLayout ref={layoutRef}>
+    <AuthLayout ref={layoutRef} mobileHero>
       <p className="login-kicker" data-reveal>Welcome back</p>
       <h1 className="login-title" data-reveal>Log in to SplitUp</h1>
       <p className="login-sub" data-reveal>See your group's balances in one glance.</p>
@@ -44,6 +45,7 @@ export default function Login() {
             required
             value={email}
             onChange={e => setEmail(e.target.value)}
+            startIcon="mail"
           />
         </div>
         <div data-reveal>
@@ -54,6 +56,7 @@ export default function Login() {
             required
             value={password}
             onChange={e => setPassword(e.target.value)}
+            startIcon="lock"
           />
         </div>
         {error && <p className="error-text login-error" role="alert">{error}</p>}
